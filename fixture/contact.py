@@ -55,14 +55,36 @@ class ContactHelper:
     def delete_first_contact(self):
         driver = self.gen.driver
         driver.find_element_by_name("selected[]").click()
-        driver.find_element_by_xpath("//input[@value='Delete']").click()
+        self.delete_button_click()
         driver.switch_to_alert()
         Alert(driver).accept()
         self.return_to_home_page()
+
+    def delete_contact_from_edit_page(self):
+        driver = self.gen.driver
+        self.edit_button_click()
+        self.delete_button_click()
+        self.return_to_home_page()
+
+    def delete_button_click(self):
+        driver = self.gen.driver
+        driver.find_element_by_xpath("//input[@value='Delete']").click()
 
     def return_to_home_page(self):
         driver = self.gen.driver
         driver.find_element_by_link_text("home").click()
 
-    def modify_first_contact(self):
-        pass
+    def edit_first_contact(self, new_contact_data):
+        driver = self.gen.driver
+        self.edit_button_click()
+        self.fill_contact_form(new_contact_data)
+        driver.find_element_by_name("update").click()
+        self.return_to_home_page()
+
+    def edit_button_click(self):
+        driver = self.gen.driver
+        driver.find_element_by_xpath("//img[@alt='Edit']").click()
+
+    def count(self):
+        driver = self.gen.driver
+        return len(driver.find_elements_by_name("selected[]"))

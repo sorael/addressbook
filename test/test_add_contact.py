@@ -9,3 +9,11 @@ def test_add_contact(gen):
         home="home", mobile="mobile", work="work", fax="fax", email2="email2@email2.ru", email3="email3@email3.ru",
         homepage="homepage.com", bday="2", bmonth="February", byear="1993", aday="8", amonth="June", ayear="2000",
         address2="address2", phone2="phone2", notes="notes"))
+
+def test_add_empty_contact_after_added_contact(gen):
+    gen.contact.create(Contact(
+        firstname="", middlename="", lastname="", nickname="",
+        photo="", title="", company="", address="",
+        home="", mobile="", work="", fax="", email2="", email3="",
+        homepage="", bday="", bmonth="", byear="", aday="", amonth="", ayear="",
+        address2="", phone2="", notes=""))
