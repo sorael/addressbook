@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from model.contact import Contact
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.alert import Alert
 
@@ -9,10 +10,19 @@ class ContactHelper:
 
     def create(self, contact):
         driver = self.gen.driver
-        driver.find_element_by_link_text("add new").click()
+        self.click_add_new_button()
         self.fill_contact_form(contact)
-        driver.find_element_by_name("submit").click()
+        self.click_submit_button()
         self.return_to_home_page()
+        self.group_cache = None
+
+    def click_add_new_button(self):
+        driver = self.gen.driver
+        driver.find_element_by_link_text("add new").click()
+
+    def click_submit_button(self):
+        driver = self.gen.driver
+        driver.find_element_by_name("submit").click()
 
     def fill_contact_form(self, contact):
         driver = self.gen.driver
@@ -20,7 +30,7 @@ class ContactHelper:
         self.change_field_value("middlename", contact.middlename)
         self.change_field_value("lastname", contact.lastname)
         self.change_field_value("nickname", contact.nickname)
-        self.change_field_value("photo", contact.photo)
+        # self.change_field_value("photo", contact.photo)
         self.change_field_value("title", contact.title)
         self.change_field_value("company", contact.company)
         self.change_field_value("address", contact.address)
@@ -54,17 +64,26 @@ class ContactHelper:
 
     def delete_first_contact(self):
         driver = self.gen.driver
+        self.open_home_page()
         driver.find_element_by_name("selected[]").click()
         self.delete_button_click()
         driver.switch_to_alert()
         Alert(driver).accept()
         self.return_to_home_page()
+        self.group_cache = None
+
+    def open_home_page(self):
+        driver = self.gen.driver
+        if not (len(driver.find_elements_by_xpath("//input[@value='Send e-Mail']")) == 1):
+            driver.find_element_by_link_text("home").click()
 
     def delete_contact_from_edit_page(self):
         driver = self.gen.driver
+
         self.edit_button_click()
         self.delete_button_click()
         self.return_to_home_page()
+        self.group_cache = None
 
     def delete_button_click(self):
         driver = self.gen.driver
@@ -74,12 +93,18 @@ class ContactHelper:
         driver = self.gen.driver
         driver.find_element_by_link_text("home").click()
 
+    def add_next(self):
+        driver = self.gen.driver
+        driver.find_element_by_link_text("add next").click()
+
     def edit_first_contact(self, new_contact_data):
         driver = self.gen.driver
+        self.open_home_page()
         self.edit_button_click()
         self.fill_contact_form(new_contact_data)
         driver.find_element_by_name("update").click()
         self.return_to_home_page()
+        self.group_cache = None
 
     def edit_button_click(self):
         driver = self.gen.driver
@@ -88,3 +113,23 @@ class ContactHelper:
     def count(self):
         driver = self.gen.driver
         return len(driver.find_elements_by_name("selected[]"))
+
+    def create_after_added_contact(self,contact):
+        driver = self.gen.driver
+        self.click_add_new_button()
+        self.fill_contact_form(contact)
+        self.click_submit_button()
+        self.add_next()
+        self.create(contact)
+
+    group_cache = None
+
+    def get_contact_list(self):
+        if self.group_cache is None:
+            driver = self.gen.driver
+            self.group_cache = []
+            for i in driver.find_elements_by_xpath("//tr[@name='entry']"):
+                firstname = i.find_element_by_xpath("td[3]").text
+                id = i.find_element_by_name("selected[]").get_attribute("value")
+                self.group_cache.append(Contact(firstname=firstname, id=id))
+        return list(self.group_cache)
