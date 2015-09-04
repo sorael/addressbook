@@ -8,7 +8,6 @@ class General:
 
     def __init__(self):
         self.driver = WebDriver()
-        # self.driver.implicitly_wait(5)
         self.session = SessionHelper(self)
         self.group = GroupHelper(self)
         self.contact = ContactHelper(self)

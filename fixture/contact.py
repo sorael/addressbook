@@ -9,12 +9,11 @@ class ContactHelper:
         self.gen = gen
 
     def create(self, contact):
-        driver = self.gen.driver
         self.click_add_new_button()
         self.fill_contact_form(contact)
         self.click_submit_button()
         self.return_to_home_page()
-        self.group_cache = None
+        self.contact_cache = None
 
     def click_add_new_button(self):
         driver = self.gen.driver
@@ -62,28 +61,31 @@ class ContactHelper:
             driver.find_element_by_name(field_name).clear()
             driver.find_element_by_name(field_name).send_keys(text)
 
-    def delete_first_contact(self):
+    def delete_contact_from_contacts_page(self, index):
         driver = self.gen.driver
         self.open_home_page()
-        driver.find_element_by_name("selected[]").click()
+        self.select_contact_by_index(index)
         self.delete_button_click()
         driver.switch_to_alert()
         Alert(driver).accept()
         self.return_to_home_page()
-        self.group_cache = None
+        self.contact_cache = None
+
+    def select_contact_by_index(self, index):
+        driver = self.gen.driver
+        driver.find_elements_by_name("selected[]")[index].click()
 
     def open_home_page(self):
         driver = self.gen.driver
         if not (len(driver.find_elements_by_xpath("//input[@value='Send e-Mail']")) == 1):
             driver.find_element_by_link_text("home").click()
 
-    def delete_contact_from_edit_page(self):
-        driver = self.gen.driver
-
-        self.edit_button_click()
+    def delete_contact_from_edit_page(self, index):
+        self.open_home_page()
+        self.edit_button_click(index)
         self.delete_button_click()
         self.return_to_home_page()
-        self.group_cache = None
+        self.contact_cache = None
 
     def delete_button_click(self):
         driver = self.gen.driver
@@ -97,39 +99,53 @@ class ContactHelper:
         driver = self.gen.driver
         driver.find_element_by_link_text("add next").click()
 
-    def edit_first_contact(self, new_contact_data):
+    def edit_contact_from_home_page(self, index, new_contact_data):
         driver = self.gen.driver
         self.open_home_page()
-        self.edit_button_click()
+        self.edit_button_click(index)
         self.fill_contact_form(new_contact_data)
         driver.find_element_by_name("update").click()
         self.return_to_home_page()
-        self.group_cache = None
+        self.contact_cache = None
 
-    def edit_button_click(self):
+    def edit_contact_from_contact_page(self, index, new_contact_data):
         driver = self.gen.driver
-        driver.find_element_by_xpath("//img[@alt='Edit']").click()
+        self.open_home_page()
+        self.detail_button_click(index)
+        driver.find_element_by_name("modifiy").click()
+        self.fill_contact_form(new_contact_data)
+        driver.find_element_by_name("update").click()
+        self.return_to_home_page()
+        self.contact_cache = None
+
+    def edit_button_click(self, index):
+        driver = self.gen.driver
+        driver.find_elements_by_xpath("//img[@alt='Edit']")[index].click()
+
+    def detail_button_click(self, index):
+        driver = self.gen.driver
+        driver.find_elements_by_xpath("//img[@title='Details']")[index].click()
 
     def count(self):
         driver = self.gen.driver
         return len(driver.find_elements_by_name("selected[]"))
 
-    def create_after_added_contact(self,contact):
-        driver = self.gen.driver
+    def create_after_added_contact(self, contact):
         self.click_add_new_button()
         self.fill_contact_form(contact)
         self.click_submit_button()
         self.add_next()
         self.create(contact)
+        self.contact_cache = None
 
-    group_cache = None
+    contact_cache = None
 
     def get_contact_list(self):
-        if self.group_cache is None:
+        if self.contact_cache is None:
             driver = self.gen.driver
-            self.group_cache = []
+            self.contact_cache = []
             for i in driver.find_elements_by_xpath("//tr[@name='entry']"):
                 firstname = i.find_element_by_xpath("td[3]").text
-                id = i.find_element_by_name("selected[]").get_attribute("value")
-                self.group_cache.append(Contact(firstname=firstname, id=id))
-        return list(self.group_cache)
+                contact_id = i.find_element_by_name("selected[]").get_attribute("value")
+                self.contact_cache.append(Contact(firstname=firstname, id=contact_id))
+        return list(self.contact_cache)
