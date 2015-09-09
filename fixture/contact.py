@@ -158,8 +158,8 @@ class ContactHelper:
             self.contact_cache = []
             for i in driver.find_elements_by_xpath("//tr[@name='entry']"):
                 cells = i.find_elements_by_tag_name("td")
-                firstname = cells[1].text
-                lastname = cells[2].text
+                firstname = cells[2].text
+                lastname = cells[1].text
                 contact_id = i.find_element_by_name("selected[]").get_attribute("value")
                 all_phones = cells[5].text
                 self.contact_cache.append(Contact(firstname=firstname, lastname=lastname, id=contact_id,
@@ -186,9 +186,21 @@ class ContactHelper:
         firstname = names[0]
         lastname = names[2]
         text = driver.find_element_by_id("content").text
-        homephone = re.search("H: (.*)", text).group(1)
-        mobilephone = re.search("M: (.*)", text).group(1)
-        workphone = re.search("W: (.*)", text).group(1)
-        secondaryphone = re.search("P: (.*)", text).group(1)
+        try:
+            homephone = re.search("H: (.*)", text).group(1)
+        except:
+            homephone = None
+        try:
+            mobilephone = re.search("M: (.*)", text).group(1)
+        except:
+            mobilephone = None
+        try:
+            workphone = re.search("W: (.*)", text).group(1)
+        except:
+            workphone = None
+        try:
+            secondaryphone = re.search("P: (.*)", text).group(1)
+        except:
+            secondaryphone = None
         return Contact(firstname=firstname, lastname=lastname, homephone=homephone,
                        mobilephone=mobilephone, workphone=workphone, secondaryphone=secondaryphone)

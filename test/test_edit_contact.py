@@ -10,6 +10,7 @@ def test_edit_contact_firstname_from_home_page(gen):
     index = randrange(len(old_contacts))
     contact = Contact(firstname="New firstname")
     contact.id = old_contacts[index].id
+    contact.lastname = old_contacts[index].lastname
     gen.contact.edit_contact_from_home_page(index, contact)
     assert len(old_contacts) == gen.contact.count()
     new_contacts = gen.contact.get_contact_list()
@@ -24,6 +25,7 @@ def test_edit_contact_firstname_from_contact_page(gen):
     index = randrange(len(old_contacts))
     contact = Contact(firstname="New firstname")
     contact.id = old_contacts[index].id
+    contact.lastname = old_contacts[index].lastname
     gen.contact.edit_contact_from_contact_page(index, contact)
     assert len(old_contacts) == gen.contact.count()
     new_contacts = gen.contact.get_contact_list()
