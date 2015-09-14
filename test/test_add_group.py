@@ -1,14 +1,34 @@
 # -*- coding: utf-8 -*-
 import pytest
 from model.group import Group
-from data.add_group import constant as test_data
+from data.groups import test_data
 
 
-@pytest.mark.parametrize("group", test_data, ids=[str(x) for x in test_data])
-def test_add_group(gen, group):
+def test_add_group(gen, json_groups):
+    group = json_groups
     old_groups = gen.group.get_group_list()
     gen.group.create(group)
     assert len(old_groups) + 1 == gen.group.count()
     new_groups = gen.group.get_group_list()
     old_groups.append(group)
     assert sorted(old_groups, key=Group.id_or_max) == sorted(new_groups, key=Group.id_or_max)
+
+
+# def test_add_group(gen, data_groups):
+#     group = data_groups
+#     old_groups = gen.group.get_group_list()
+#     gen.group.create(group)
+#     assert len(old_groups) + 1 == gen.group.count()
+#     new_groups = gen.group.get_group_list()
+#     old_groups.append(group)
+#     assert sorted(old_groups, key=Group.id_or_max) == sorted(new_groups, key=Group.id_or_max)
+
+
+# @pytest.mark.parametrize("group", test_data, ids=[str(x) for x in test_data])
+# def test_add_group(gen, group):
+#     old_groups = gen.group.get_group_list()
+#     gen.group.create(group)
+#     assert len(old_groups) + 1 == gen.group.count()
+#     new_groups = gen.group.get_group_list()
+#     old_groups.append(group)
+#     assert sorted(old_groups, key=Group.id_or_max) == sorted(new_groups, key=Group.id_or_max)
